@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>SHIMOTSUKI APP </title>
+<style>
+:root{
+  --bg-1:#070203; --bg-2:#170305;
+  --card:#110305; --muted:#b08989;
+  --accent:#ff1230; --accent2:#ff6b6b; --accent3:#ffb86b;
+  --radius:14px; --shadow:0 18px 80px rgba(0,0,0,.65);
+  --safe-top: env(safe-area-inset-top);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,system-ui;background:
+  radial-gradient(900px 600px at 115% -10%, rgba(255,107,107,.04), transparent 60%),
+  radial-gradient(700px 600px at -10% 110%, rgba(255,18,48,.03), transparent 60%),
+  linear-gradient(180deg,var(--bg-2),var(--bg-1));color:#fff;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+
+/* petals */
+.petal-wrap{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.petal{position:absolute;top:-10%;width:8px;height:10px;background:radial-gradient(circle at 40% 25%, #fff 5%, #ffdfe6 25%, #ffbfd0 60%);border-radius:7px;opacity:.9;filter:blur(.5px);animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(120vh) rotate(360deg);opacity:.9}}
+
+/* splash */
+#splash{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,#0f0304,#050001);z-index:9999}
+.s-card{width:min(540px,92%);padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border:1px solid rgba(255,18,48,.12);box-shadow:var(--shadow);text-align:center}
+.s-logo{width:110px;height:110px;margin:0 auto;border-radius:20px;background:linear-gradient(180deg,#2a0406,#1a0204);display:grid;place-items:center;font-weight:900;font-size:34px;color:var(--accent2);box-shadow:0 8px 40px rgba(255,18,48,.12) inset}
+.s-title{margin-top:10px;font-weight:900;font-size:20px;letter-spacing:1px;color:var(--accent)}
+.progress{margin-top:16px;width:86%;height:10px;border-radius:999px;background:#0c0505;overflow:hidden;border:1px solid rgba(255,255,255,.03)}
+.progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 0 20px rgba(255,18,48,.12) inset;transition:width .24s}
+
+/* app */
+.app{display:none;min-height:100vh;padding:calc(var(--safe-top) + 12px) 14px 36px;position:relative;z-index:1}
+.shell{width:min(980px,96vw);margin:0 auto;border-radius:16px;padding:10px;background:linear-gradient(180deg,rgba(255,255,255,.01),transparent);backdrop-filter:blur(6px);border:1px solid rgba(255,18,48,.04);box-shadow:var(--shadow);overflow:hidden}
+
+/* header */
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03)}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:50px;height:50px;border-radius:12px;background:linear-gradient(180deg,#2a0406,#150203);display:grid;place-items:center;font-weight:900;color:var(--accent);box-shadow:0 8px 30px rgba(255,18,48,.08) inset}
+.h-title{font-weight:900;font-size:17px}
+.h-sub{font-size:12px;color:var(--muted)}
+
+/* content scroll */
+.content{padding:12px;overflow:auto}
+
+/* section */
+.section{background:linear-gradient(180deg,#110204,#0a0202);border-radius:12px;padding:12px;margin-bottom:12px;border:1px solid rgba(255,255,255,.03)}
+.section h2{margin:0 0 8px;color:var(--accent);font-weight:900}
+
+/* group item row */
+.item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;border-bottom:1px dashed rgba(255,255,255,.02)}
+.item:last-child{border-bottom:0}
+.icon{width:44px;height:44px;border-radius:10px;background:linear-gradient(180deg,#200406,#140203);display:grid;place-items:center;font-weight:900;color:var(--accent2);flex:0 0 44px}
+.meta{flex:1}
+.title{font-weight:800}
+.desc{font-size:13px;color:var(--muted)}
+.right{flex:0 0 auto}
+
+/* switch style */
+.switch{width:56px;height:30px;border-radius:999px;background:#1f2123;position:relative;border:1px solid rgba(255,255,255,.04);cursor:pointer;flex:0 0 auto}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .18s}
+.switch.on{background:linear-gradient(90deg,var(--accent3),var(--accent));}
+.switch.on::after{transform:translateX(26px)}
+
+/* sliders */
+.slider-line{display:flex;align-items:center;gap:10px}
+.slider-label{font-weight:800}
+input[type=range]{-webkit-appearance:none;width:100%;height:12px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid rgba(255,18,48,.95);box-shadow:0 8px 26px rgba(255,18,48,.12)}
+
+/* game cards */
+.game-row{display:flex;gap:10px;align-items:center}
+.game-btn{flex:1;padding:10px;border-radius:12px;background:linear-gradient(180deg,#120406,#0f0202);border:1px solid rgba(255,255,255,.02);display:flex;align-items:center;gap:10px;cursor:pointer}
+.game-thumb{width:46px;height:46px;border-radius:8px;background:#210305;display:grid;place-items:center;font-weight:900;color:var(--accent2)}
+.game-name{font-weight:900}
+
+/* small placeholder */
+.placeholder{height:84px;border-radius:10px;background:linear-gradient(180deg,#120306,#0f0202);display:grid;place-items:center;border:1px dashed rgba(255,255,255,.04);color:var(--muted)}
+
+/* centered toast (simple) */
+#toast{
+  position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(255,18,48,.95),rgba(255,107,107,.95));
+  color:#fff;padding:10px 14px;border-radius:12px;font-weight:800;box-shadow:0 18px 80px rgba(255,18,48,.08);z-index:99999;opacity:0;transition:opacity .18s;
+}
+
+/* responsive */
+@media(max-width:720px){
+  .game-row{flex-direction:column}
+  .item{padding:10px 6px}
+  .game-btn{width:100%}
+}
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+</style>
+</head>
+<body>
+
+<div class="petal-wrap" id="petalWrap" aria-hidden="true"></div>
+
+<!-- Splash -->
+<section id="splash">
+  <div class="s-card" role="dialog" aria-label="Splash">
+    <div class="s-logo" id="splashLogo">S</div>
+    <div class="s-title">SHIMOTSUKI APP</div>
+    <div class="s-sub">Red Neon — Web Clip</div>
+    <div class="progress"><div id="progressBar"></div></div>
+  </div>
+</section>
+
+<!-- APP -->
+<div class="app" id="app" style="display:none">
+  <div class="shell" role="application" aria-label="Shimotsuki Menu">
+    <div class="header">
+      <div class="brand">
+      <div class="logo" id="brandLogo">
+  <img src="https://i.postimg.cc/0yWBS6qZ/1430566-E-960-B-48-FD-A166-D9-A91-A59-BAE7.png" 
+       alt="Logo" 
+       style="width:90px;height:90px;border-radius:50%;object-fit:cover;box-shadow:0 0 15px red;">
+</div>
+  </a>
+</div>
+        <div>
+          <div class="h-title">SHIMOTSUKI APP</div>
+          <div class="h-sub">APP REGEDIT PRO</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- choose game -->
+      <section class="section" id="chooseGame">
+        <h2>Chọn game khởi chạy</h2>
+        <div class="hint">Chọn game rồi nhấn Khởi chạy.</div>
+        <div style="height:10px"></div>
+       <!-- Free Fire -->
+<div class="game-btn" id="btn-ff">
+  <div class="game-thumb">
+    <img id="imgFF" 
+         src="https://i.postimg.cc/gX4jx8SL/IMG-2407.png" 
+         alt="FF" 
+         style="width:50px;height:50px;object-fit:cover;border-radius:50%">
+  </div>
+  <div>
+    <div class="game-name">FREE FIRE</div>
+    <div class="desc"></div>
+  </div>
+</div>
+
+<!-- Free Fire Max -->
+<div class="game-btn" id="btn-ffm">
+  <div class="game-thumb">
+    <img id="imgFFM" 
+         src="https://i.postimg.cc/MXPXx0fh/IMG-2406.png" 
+         alt="FFM" 
+         style="width:50px;height:50px;object-fit:cover;border-radius:50%">
+  </div>
+  <div>
+    <div class="game-name">FREE FIRE MAX</div>
+    <div class="desc"</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+        <div class="placeholder" id="gameImage">CHỌN ĐÚNG APP KHỞI CHẠY ĐỂ TỐI ƯU THIẾT BỊ</div>
+
+        <div style="height:12px"></div>
+        <div style="display:flex;gap:8px">
+          <div class="game-btn" id="launchBtn" style="background:linear-gradient(90deg,var(--accent),var(--accent2));color:#000;font-weight:900">Khởi chạy</div>
+          <div class="game-btn" id="clearBtn" style="background:linear-gradient(180deg,#120406,#180304)">Bỏ chọn</div>
+        </div>
+      </section>
+
+      <!-- system group -->
+      <section class="section" id="systemGroup">
+        <h2>Hệ thống</h2>
+        <div class="item">
+          <div class="icon">IG</div>
+          <div class="meta"><div class="title">Optimizer</div><div class="desc">Bật tối ưu hoá hệ thống</div></div>
+          <div class="right"><div class="switch" data-key="optimizer"></div></div>
+        </div>
+        <div class="item">
+          <div class="icon">⚡</div>
+          <div class="meta"><div class="title">Sensitivity Boost</div><div class="desc">Tăng độ nhạy mượt</div></div>
+          <div class="right"><div class="switch" data-key="sensboost"></div></div>
+        </div>
+        <div class="item">
+          <div class="icon">TS</div>
+          <div class="meta"><div class="title">Touch Screen</div><div class="desc">Cải thiện cảm ứng</div></div>
+          <div class="right"><div class="switch" data-key="touchscreen"></div></div>
+        </div>
+        <div class="item">
+          <div class="icon">🔊</div>
+          <div class="meta"><div class="title">UI Sounds</div><div class="desc">Tắt/bật âm UI</div></div>
+          <div class="right"><div class="switch" data-key="uisounds"></div></div>
+        </div>
+      </section>
+
+      <!-- combat macros -->
+      <section class="section" id="combatGroup">
+        <h2>Combat Macros</h2>
+        <div class="item">
+          <div class="icon">🎯</div>
+          <div class="meta"><div class="title">AimLock</div><div class="desc">AIM SCOPE-AIM ASSIST</div></div>
+          <div class="right"><div class="switch" data-key="aimlock"></div></div>
+        </div>
+        <div class="item">
+          <div class="icon">🔩</div>
+          <div class="meta"><div class="title">HeadLock</div><div class="desc">KHOÁ TÂM VÙNG ĐẦU</div></div>
+          <div class="right"><div class="switch" data-key="headlock"></div></div>
+        </div>
+        <div class="item">
+          <div class="icon">🧲</div>
+          <div class="meta"><div class="title">AimDrag</div><div class="desc">TÂM ÊM BÁM ĐẦU</div></div>
+          <div class="right"><div class="switch" data-key="aimdrag"></div></div>
+        </div>
+        <div class="item">
+          <div class="icon">💨</div>
+          <div class="meta"><div class="title">Smooth View</div><div class="desc">CẢM GIÁC MƯỢT TÂM</div></div>
+          <div class="right"><div class="switch" data-key="smoothview"></div></div>
+        </div>
+        <div class="item">
+          <div class="icon">⚙️</div>
+          <div class="meta"><div class="title">FIX RUNG</div><div class="desc">XOÁ TÌNH TRẠNG RUNG TÂM</div></div>
+          <div class="right"><div class="switch" data-key="m5"></div></div>
+        </div>
+        <div class="item">
+          <div class="icon">⚔️</div>
+          <div class="meta"><div class="title">FIX LỐ</div><div class="desc">XOÁ TÌNH TRẠNG LỐ ĐẦU</div></div>
+          <div class="right"><div class="switch" data-key="m6"></div></div>
+        </div>
+        <div class="item">
+          <div class="icon">🌪️</div>
+          <div class="meta"><div class="title">BUFF SCREEN</div><div class="desc">TĂNG ĐỘ PHÂN GIẢI MÀN HÌNH</div></div>
+          <div class="right"><div class="switch" data-key="m7"></div></div>
+        </div>
+        <div class="item">
+          <div class="icon">🍏</div>
+          <div class="meta"><div class="title">FPS PRO</div><div class="desc">TỐI ƯU MẠNG VÀ FPS</div></div>
+          <div class="right"><div class="switch" data-key="m8"></div></div>
+        </div>
+      </section>
+
+      <!-- sliders -->
+      <section class="section" id="sliders">
+        <h2>Tinh chỉnh</h2>
+        <div class="hint">Điều chỉnh FPS / DPI / Touch sensitivity</div>
+
+        <div style="margin-top:8px">
+          <div class="slider-line"><div class="slider-label">FPS</div><div id="fpsOut" style="font-weight:900">120</div></div>
+          <input id="fpsRange" type="range" min="30" max="240" value="120">
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="slider-line"><div class="slider-label">DPI</div><div id="dpiOut" style="font-weight:900">400</div></div>
+          <input id="dpiRange" type="range" min="100" max="1000" value="400">
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="slider-line"><div class="slider-label">Touch</div><div id="touchOut" style="font-weight:900">50</div></div>
+          <input id="touchRange" type="range" min="0" max="100" value="50">
+        </div>
+      </section>
+
+      <div class="note">©️NTOM🇻🇳 CẤM HÀNH VI CRACK ĂN CẮP - MENU APP ĐƯỢC PHÁT TRIỂN ĐỘC QUYỀN BỞI TEAM SHIMOTSUKI🇻🇳</div>
+    </div>
+  </div>
+</div>
+
+<!-- toast (single neat popup) -->
+<div id="toast" aria-live="polite" role="status"></div>
+
+<script>
+/* SHIMOTSUKI APP — final
+   - giữ code gốc, thêm game cards + toggles + sliders
+   - đơn giản toast (1 popup) on/off/launch
+   - lưu state vào localStorage
+*/
+
+const NS = 'shim_final_v1';
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+
+/* petals */
+function makePetals(n=28){
+  const wrap = document.getElementById('petalWrap');
+  if(!wrap) return;
+  wrap.innerHTML='';
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div'); p.className='petal';
+    p.style.left=(Math.random()*100)+'vw';
+    p.style.animationDuration=(6+Math.random()*7)+'s';
+    p.style.animationDelay=('-'+(Math.random()*8))+'s';
+    const sz=6+Math.random()*12;
+    p.style.width=sz+'px'; p.style.height=Math.round(sz*1.2)+'px';
+    p.style.opacity=0.3+Math.random()*0.8;
+    p.style.transform='rotate('+ (Math.random()*60-30) +'deg)';
+    wrap.appendChild(p);
+  }
+}
+makePetals(30);
+
+/* splash load */
+document.addEventListener('DOMContentLoaded', () => {
+  const bar = document.getElementById('progressBar');
+  let p=0;
+  const id = setInterval(()=> {
+    p += Math.floor(6 + Math.random()*8);
+    if(p>100) p=100;
+    bar.style.width = p + '%';
+    if(p>=100){ clearInterval(id); setTimeout(()=>{ $('#splash').style.display='none'; $('#app').style.display='block'; initApp(); }, 650); }
+  }, 60);
+});
+
+/* toast simple */
+let toastTimer;
+function toast(msg, t=1600){
+  const el = $('#toast');
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> el.style.opacity = '0', t);
+}
+
+/* toggles binding */
+function bindToggles(){
+  $$('[data-key]').forEach(el=>{
+    el.tabIndex = 0;
+    el.addEventListener('click', ()=> {
+      el.classList.toggle('on');
+      const key = el.dataset.key;
+      const on = el.classList.contains('on');
+      saveToggle(key,on);
+      // simple toast messages per your last instruction (not hacker spam)
+      if(on) { toast('🔓 Kích hoạt ' + readable(key)); setTimeout(()=> toast('✅ Thành công'), 500); }
+      else { toast('⛔ Tắt ' + readable(key)); setTimeout(()=> toast('❌ Huỷ bỏ'), 500); }
+    });
+    el.addEventListener('keydown', (e)=> { if(e.key==='Enter' || e.key===' ') { e.preventDefault(); el.click(); }});
+  });
+}
+
+/* readable mapping */
+function readable(k){
+  const map = {
+    optimizer:'Optimizer','sensboost':'Sensitivity Boost','touchscreen':'Touch Screen',
+    uisounds:'UI Sounds','aimlock':'AimLock','headlock':'HeadLock','aimdrag':'AimDrag','smoothview':'Smooth View',
+    m5:'Macro 5',m6:'Macro 6',m7:'Macro 7',m8:'Macro 8','img':'Khung ảnh'
+  };
+  return map[k] || k;
+}
+
+/* save/load toggles */
+function saveToggle(k,v){
+  try{
+    const raw = localStorage.getItem(NS + '_toggles');
+    const obj = raw?JSON.parse(raw):{};
+    obj[k]=!!v;
+    localStorage.setItem(NS + '_toggles', JSON.stringify(obj));
+  }catch(e){}
+}
+function loadToggles(){
+  try{
+    const raw = localStorage.getItem(NS + '_toggles');
+    if(!raw) return;
+    const obj = JSON.parse(raw);
+    Object.keys(obj).forEach(k=>{
+      const el = document.querySelector('[data-key="'+k+'"]');
+      if(el) el.classList.toggle('on', !!obj[k]);
+    });
+  }catch(e){}
+}
+
+/* sliders */
+function bindSliders(){
+  const fps = $('#fpsRange'), dpi = $('#dpiRange'), touch = $('#touchRange');
+  fps.addEventListener('input', ()=> { $('#fpsOut').textContent = fps.value; saveSlider('fps', +fps.value); });
+  dpi.addEventListener('input', ()=> { $('#dpiOut').textContent = dpi.value; saveSlider('dpi', +dpi.value); });
+  touch.addEventListener('input', ()=> { $('#touchOut').textContent = touch.value; saveSlider('touch', +touch.value); });
+}
+function saveSlider(k,v){
+  try{
+    const raw = localStorage.getItem(NS + '_sliders');
+    const obj = raw?JSON.parse(raw):{};
+    obj[k]=v; localStorage.setItem(NS + '_sliders', JSON.stringify(obj));
+  }catch(e){}
+}
+function loadSliders(){
+  try{
+    const raw = localStorage.getItem(NS + '_sliders');
+    if(!raw) return;
+    const obj = JSON.parse(raw);
+    if(obj.fps){ $('#fpsRange').value=obj.fps; $('#fpsOut').textContent=obj.fps; }
+    if(obj.dpi){ $('#dpiRange').value=obj.dpi; $('#dpiOut').textContent=obj.dpi; }
+    if(obj.touch){ $('#touchRange').value=obj.touch; $('#touchOut').textContent=obj.touch; }
+  }catch(e){}
+}
+
+/* game choose */
+let selectedGame = localStorage.getItem(NS + '_game') || '';
+function bindGames(){
+  $('#btn-ff').addEventListener('click', ()=> chooseGame('ff'));
+  $('#btn-ffm').addEventListener('click', ()=> chooseGame('ffm'));
+  $('#launchBtn').addEventListener('click', ()=> {
+    if(!selectedGame){ toast('⚠️ Vui lòng chọn game trước'); return; }
+    toast('🔛 Đang khởi chạy ' + (selectedGame==='ffm'?'FREE FIRE MAX':'FREE FIRE'));
+    setTimeout(()=> toast('✅ Khởi chạy thành công'),800);
+  });
+  $('#clearBtn').addEventListener('click', ()=> { selectedGame=''; localStorage.removeItem(NS + '_game'); reflectGame(); toast('Đã bỏ chọn'); });
+}
+function chooseGame(k){
+  selectedGame = k;
+  localStorage.setItem(NS + '_game', k);
+  reflectGame();
+  toast('Đã chọn ' + (k==='ffm'?'FREE FIRE MAX':'FREE FIRE'));
+}
+function reflectGame(){
+  $('#btn-ff').classList.toggle('active', selectedGame==='ff');
+  $('#btn-ffm').classList.toggle('active', selectedGame==='ffm');
+}
+
+/* init */
+function initApp(){
+  bindToggles();
+  bindSliders();
+  bindGames();
+  loadToggles();
+  loadSliders();
+  reflectGame();
+}
+
+/* defaults */
+(function defaults(){
+  if(!localStorage.getItem(NS + '_sliders')){
+    localStorage.setItem(NS + '_sliders', JSON.stringify({fps:120,dpi:400,touch:50}));
+  }
+})();
+
+/* safety show app after 3.5s if splash stuck */
+window.addEventListener('load', ()=> {
+  setTimeout(()=> {
+    if($('#splash') && $('#splash').style.display !== 'none'){
+      $('#splash').style.display='none';
+      $('#app').style.display='block';
+      initApp();
+    }
+  }, 3500);
+});
+</script>
+</body>
+</html>
